@@ -20,6 +20,23 @@ namespace Todo.Controllers
             return View(db.Lists.ToList());
         }
 
+        public ActionResult AllDone(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            List list = db.Lists.Find(id);
+
+            foreach (var thinger in list.Items)
+            {
+                thinger.IsDone = true;
+            }
+            db.SaveChanges();
+            return RedirectToAction("Details", new { id = list.ListID });
+        }
+
         // GET: Lists/Details/5
         public ActionResult Details(int? id)
         {
@@ -103,6 +120,32 @@ namespace Todo.Controllers
                 return HttpNotFound();
             }
             return View(list);
+        }
+
+        public ActionResult ToggleDone(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Item item = db.Items.Find(id);
+            if (item == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (item.IsDone)
+            {
+                item.IsDone = false;
+            }
+            else
+            {
+                item.IsDone = true;
+            }
+
+            db.SaveChanges();
+
+            return RedirectToAction("Details", new { id = item.ListID });
         }
 
         // POST: Lists/Delete/5
